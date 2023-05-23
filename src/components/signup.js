@@ -9,6 +9,7 @@ const Signup = () => {
     repeat_pass:""
 })
 
+
 const [Register,setRegister]=useState([])
   // console.log(regData)
   // get data from textbox
