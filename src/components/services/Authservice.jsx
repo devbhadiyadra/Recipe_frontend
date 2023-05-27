@@ -6,7 +6,7 @@ class Authservice{
         return axios.post(URL+"/registration/adduser",data)
     }
 
-    
+    ded
 }
 
 export default new Authservice
