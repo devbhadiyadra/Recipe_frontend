@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState} from "react";
 import "./style.css";
-
+import Navbar from '../components/navbar'
 const Signup = () => {
   const [regData, setregData] = useState({
     username: "",
@@ -29,6 +29,7 @@ const Signup = () => {
 
   return (
     <>
+    <Navbar/>
       <section>
         <div className="mask d-flex align-items-center h-100 gradient-custom-3">
           <div className="container h-100">
@@ -152,7 +153,9 @@ const Signup = () => {
         );
       })}
     </>
+    
   );
+  
 };
 
 export default Signup;
