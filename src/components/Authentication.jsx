@@ -1,94 +1,120 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
 import {
   MDBContainer,
   MDBTabs,
   MDBTabsItem,
-  MDBTabsLink,
   MDBTabsContent,
   MDBTabsPane,
-  // MDBBtn,
   MDBInput,
   MDBCheckbox,
 } from "mdb-react-ui-kit";
 import Navbar from "./navbar";
-import { toast } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Authservice from "./services/Authservice";
 import axios from "axios";
-// import LoginComponent  from './LoginComponent '
+import { Link ,useHistory } from "react-router-dom";
 
 function App() {
   // sign up functions
   const [regData, setregData] = useState({
     name: "",
     email: "",
-    password: "",
-
-    // repeat_pass: "",
+    password: ""
   });
 
-  const [Register, setRegister] = useState([]);
-  // console.log(regData)
   // get data from textbox
-  const handler = (e) => {
-    const name = e.target.name;
+  const get_register_data_handler = (e, field) => {
     var value = e.target.value;
-    setregData({ ...regData, [name]: value });
-    // console.log(value)
+    setregData({ ...regData, [field]: value });
   };
 
-  const register = (e) => {
+  // store password that written in textbo
+  const[repeat_pass,setrepeat_pass]=useState('')
+  const get_repeat_pass_handler=(e)=>{
+    setrepeat_pass(e.target.value)
+  }
+  const register_handler = (e) => {
     e.preventDefault();
-
-    const newrecord = { ...regData, id: new Date().getTime().toString() };
-    //All text-box record stored in regData
-    setRegister([...Register, newrecord]);
-
-    // for send data to the server
-    Authservice.registeruser(regData)
-      .then((res) => {
-        console.log("User register successfully");
-      })
-      .catch((error) => {
-        console.log("here" + error);
-      });
-
+    // console.log(repeat_pass)
+   
     if (regData.pass === "" || regData.name === "" || regData.email === "") {
       toast.error("something went wrong", {
-        position: toast.POSITION.TOP_RIGHT,
+        position: toast.POSITION.BOTTOM_CENTER,
+      })}
+
+      if(regData.password!==repeat_pass){
+        toast.error("please enter both same password", {
+          position: toast.POSITION.BOTTOM_CENTER,
+        });
+     }
+     else {
+      toast.success("Register successfully", {
+        position: toast.POSITION.BOTTOM_CENTER,
       });
-    } else {
-      toast.success("success");
+      Authservice.registeruser(regData)
+        .then((res) => {
+          console.log("User register successfully");
+        })
+        .catch((error) => {
+          console.log("here" + error);
+        });
     }
     console.log(regData);
   };
 
   // login function
-
   const [userDetails, setUserDetails] = useState({ email: "", password: "" });
-  const loginhandler = (event, field) => {
+  const get_login_data_handler = (event, field) => {
     var actualvalue = event.target.value;
     setUserDetails({ ...userDetails, [field]: actualvalue });
   };
 
-  const login = (e) => {
+  const login_handler = (e,history) => {
     e.preventDefault();
-    console.log(userDetails);
+    // const history = useHistory();
+    // console.log(userDetails);
 
     //authentication of to the server
     const email = userDetails.email;
     const password = userDetails.password;
-    console.log(email,password)
-    axios
-      .post("http://localhost:8085/registration/login", { email, password })
-      .then((response) => {
-        console.log(response.data);
-      })
-      .catch((error) => {
-        console.error(error);
+    
+    if (email === "") {
+      toast.error("plaese enter name  ", {
+        position: toast.POSITION.BOTTOM_CENTER,
       });
+      if (password === "") {
+        toast.error("plaese enter password", {
+          position: toast.POSITION.BOTTOM_CENTER,
+        });
+      }
+    } else {
+      axios
+        .post("http://localhost:8085/registration/login", { email, password })
+        .then((response) => {
+          console.log(response);
+          if (response.data.message === "User does not exist") {
+            toast.error("username is incorrect", {
+              position: toast.POSITION.BOTTOM_CENTER,
+            });
+          } else if (response.data.isValid === false) {
+            toast.error("password is incorrect", {
+              position: toast.POSITION.BOTTOM_CENTER,
+            });
+          } else if (response.status===200) {
+              toast.success("Login successfully", {
+                position: toast.POSITION.BOTTOM_CENTER,
+              })
+              // history.push('/home');
+            }
+          
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    }
   };
+
   // extra functions
   const [justifyActive, setJustifyActive] = useState("tab1");
   const handleJustifyClick = (value) => {
@@ -109,81 +135,72 @@ function App() {
           className="mb-3 d-flex flex-row justify-content-between"
         >
           <MDBTabsItem>
-            <MDBTabsLink
+            <  Link to="/authentication/login"
               onClick={() => handleJustifyClick("tab1")}
               active={justifyActive === "tab1"}
-              style={{ color: "black" }}
+             className="btn-group__item fontcolors heading"
             >
               Login
-            </MDBTabsLink>
+              
+            </Link>
           </MDBTabsItem>
           <MDBTabsItem>
-            <MDBTabsLink
+            <Link to="/authentication/signup"  
               onClick={() => handleJustifyClick("tab2")}
               active={justifyActive === "tab2"}
+              className="btn-group__item fontcolors heading"
             >
-              <Link to="/signup" className="fontcolors">
                 Register
-              </Link>
-            </MDBTabsLink>
+            </Link>
           </MDBTabsItem>
         </MDBTabs>
         {/* login */}
         <MDBTabsContent>
           <MDBTabsPane show={justifyActive === "tab1"}>
-            <div className="text-center mb-3">
-              <p>Sign in with:</p>
+            <div className="text-center mb-3 subheading">
+              <p>Login with:</p>
               <div
                 className="d-flex justify-content-between mx-auto"
                 style={{ width: "40%" }}
               ></div>
-
-              <p className="text-center mt-3">or:</p>
             </div>
             {/* emial */}
             <MDBInput
-              wrapperClass="mb-4"
-              label="Email address"
+              wrapperClass="mb-4 mt-3 row w-75 inputbox"
+              placeholder="Email address"
               id="form1"
               type="email"
               value={userDetails.email}
-              onChange={(e) => loginhandler(e, "email")}
+              onChange={(e) => get_login_data_handler(e, "email")}
             />
             {/* password */}
             <MDBInput
-              wrapperClass="mb-4"
-              label="Password"
+              wrapperClass="mb-4 mt-3 row w-75 inputbox"
+              placeholder="Password"
               id="form2"
               type="password"
               value={userDetails.password}
-              onChange={(e) => loginhandler(e, "password")}
+              onChange={(e) => get_login_data_handler(e, "password")}
             />
 
-            <div className="d-flex justify-content-between mx-4 mb-4">
-              <MDBCheckbox
-                name="flexCheck"
-                value=""
-                id="flexCheckDefault"
-                label="Remember me"
-              />
-              <a href="!#">Forgot password?</a>
-            </div>
-
             <button
-              class="btn btn-primary"
+              class="btn btn-primary mt-3 row w-75 inputbox "
               style={{ width: "700px" }}
-              onClick={login}
-            >
-              Sign in
+              onClick={login_handler}
+              >
+              Login
             </button>
+            <div className="d-flex justify-content-between mt-3" style={{marginLeft:'510px'}}>
+              <Link to="/authentication/login/forgetpassword" >Forgot password?</Link>
+            </div>
             <p className="text-center">
-              Not a member? <a href="#!">Register</a>
+              Not a member? <Link to="/authentication/signup">Register</Link>
             </p>
           </MDBTabsPane>
           {/* sign up */}
           <MDBTabsPane show={justifyActive === "tab2"}>
-            <div className="text-center mb-3">
-              <p>Sign up with:</p>
+            <div className="text-center mb-3 subheading">
+              <p>Sign up with :</p>
 
               <div
                 className="d-flex justify-content-between mx-auto"
@@ -192,70 +209,67 @@ function App() {
             </div>
             {/* name */}
             <MDBInput
-              wrapperClass="mb-4"
-              label="name"
+              wrapperClass="mb-4 w-75 inputbox"
+              placeholder="name"
               id="form1"
               type="text"
               autoComplete="off"
               value={regData.name}
-              name="name"
-              onChange={handler}
+              onChange={(e) => get_register_data_handler(e, "name")}
               required
             />
 
             {/* email */}
             <MDBInput
-              wrapperClass="mb-4"
-              label="Email"
+              wrapperClass="mb-4  w-75 inputbox"
+              placeholder="Email"
               id="form1"
               type="email"
               autoComplete="off"
               value={regData.email}
-              name="email"
-              onChange={handler}
+              onChange={(e) => get_register_data_handler(e, "email")}
             />
             {/* password */}
             <MDBInput
-              wrapperClass="mb-4"
-              label="Password"
+              wrapperClass="mb-4 w-75 inputbox"
+              placeholder="Password"
               id="form1"
               type="password"
               autoComplete="off"
               value={regData.password}
-              name="password"
-              onChange={handler}
+              onChange={(e) => get_register_data_handler(e, "password")}
             />
             {/* repeat-password */}
-            {/* <MDBInput
-              wrapperClass="mb-4"
-              label="repeat-Password"
+             <MDBInput
+              wrapperClass="mb-4  w-75 inputbox"
+              placeholder="repeat-Password"
               id="form1"
               type="password"
               autoComplete="off"
-              value={regData.repeat_pass}
+              // value={}
               name="repeat_pass"
-              onChange={handler}
-            /> */}
+              onChange={get_repeat_pass_handler}
+            /> 
 
-            <div className="d-flex justify-content-center mb-4">
+            {/* <div className="d-flex justify-content-center mb-4">
               <MDBCheckbox
                 name="flexCheck"
                 id="flexCheckDefault"
                 label="I have read and agree to the terms"
               />
-            </div>
+            </div> */}
 
             <button
-              class="btn btn-primary"
+              class="btn btn-primary mt-3 w-75 inputbox"
               style={{ width: "700px" }}
-              onClick={register}
+              onClick={register_handler}
             >
               Sign up
             </button>
           </MDBTabsPane>
         </MDBTabsContent>
       </MDBContainer>
-
+      <ToastContainer />
       {/* print on screen all filled data */}
       {/* {Register.map((curElem) => {
         return (

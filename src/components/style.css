@@ -33,7 +33,7 @@
   }
   
   html {
-    background: #faf7f2;
+    background: white;
     background-image: url(https://s3.postimg.org/s1n3ji1ur/paper_fibers_2_X.png);
     box-sizing: border-box;
     font-family: "Lato", sans-serif;
@@ -48,7 +48,7 @@
   }
   
   .subtle {
-    color: #aaa;
+    color: white;
   }
   
   .main-card--cointainer {
@@ -374,11 +374,10 @@
   
   .btn-group__item:hover,
   .btn-group__item:focus {
-    color: white;
+    /* color: white; */
     /* box-shadow: inset 0px -20px 0px -15px rebeccapurple; */
     background-color: rgba(70, 70, 168, 0.153);
         border-radius: 20px;
-        color:white !;
   }
   
 #searchbar{
@@ -395,6 +394,27 @@
     text-decoration:none
   }
   .srcbtn:hover{
-    background-color:rgb(0, 213, 255);
- 
+    background-color:rgba(86, 204, 114, 0.355);
+    color: black;
+  }
+
+  .inputbox{
+      margin-left: 100px;
+  }
+  .heading{
+    font : 25px bold;
+  }
+  .subheading{
+    font: 15px solid bold;
+  }
+
+  .forget_otp{
+    display: none;
+  }
+  .newpass{
+    display: none;
+  }
+
+  .repeatnewpass{
+    display: none;
   }
